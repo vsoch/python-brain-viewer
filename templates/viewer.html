@@ -1,6 +1,13 @@
+<!--* ========================================================================
+ * Image Viewer Prototype with Python
+ * Poldracklab
+ * ========================================================================
+ * Copyright 2015 Poldracklab
+*/-->
+
 <!DOCTYPE html>
 <head>
-<title>Whole Brain Scatterplot Regional Comparison</title>
+<title>Brain Viewer Prototype</title>
 
 <!-- Latest compiled and minified JavaScript -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
@@ -16,15 +23,18 @@
 
 <body>
   <canvas id="canvas" width=1000 height=1000></canvas>
-  <div id="center">
+<div id="center">
     <h1>Brain Viewer Prototype</h1>
-    X: <a class="btn btn-default" href="/{{image_id}}/{{ x }}/{{ y }}/{{ z }}/{{ x + 1 }}/{{ y }}/{{ z }}">+</a>
+    <div class="label">X:</div><a class="btn btn-default" href="/{{image_id}}/{{ x }}/{{ y }}/{{ z }}/{{ x + 1 }}/{{ y }}/{{ z }}">+</a>
        <a class="btn btn-default" href="/{{image_id}}/{{ x }}/{{ y }}/{{ z }}/{{ x - 1 }}/{{ y }}/{{ z }}">-</a>
-    Y: <a class="btn btn-default" href="/{{image_id}}/{{ x }}/{{ y }}/{{ z }}/{{ x }}/{{ y + 1 }}/{{ z }}">+</a>
+    <div class="label">Y:</div><a class="btn btn-default" href="/{{image_id}}/{{ x }}/{{ y }}/{{ z }}/{{ x }}/{{ y + 1 }}/{{ z }}">+</a>
        <a class="btn btn-default" href="/{{image_id}}/{{ x }}/{{ y }}/{{ z }}/{{ x }}/{{ y - 1 }}/{{ z }}">-</a>
-    Z: <a class="btn btn-default" href="/{{image_id}}/{{ x }}/{{ y }}/{{ z }}/{{ x }}/{{ y }}/{{ z + 1 }}">+</a>
+    <div class="label">Z:</div><a class="btn btn-default" href="/{{image_id}}/{{ x }}/{{ y }}/{{ z }}/{{ x }}/{{ y }}/{{ z + 1 }}">+</a>
        <a class="btn btn-default" href="/{{image_id}}/{{ x }}/{{ y }}/{{ z }}/{{ x }}/{{ y }}/{{ z -1 }}">-</a>
 </div>
+<button class="btn viewx" disabled>X</button>
+<button class="btn viewy" disabled>Y</button>
+<button class="btn viewz" disabled>Z</button>
 
 </body>
 <script>

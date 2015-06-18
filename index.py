@@ -1,3 +1,10 @@
+# ========================================================================
+# Image Viewer Prototype with Python
+# Poldracklab
+# ========================================================================
+# Copyright 2015 Poldracklab
+#
+
 from urllib2 import Request, urlopen, HTTPError
 from flask import Flask, render_template
 from nilearn.image import resample_img
@@ -10,6 +17,16 @@ import json
 import os
 
 app = Flask(__name__)
+
+# Validate coordinates
+def check_coords(image_data,newx,newy,newz,oldx,oldy,oldz):
+    if newx not in range(1,image_data.shape[0]+1):
+        newx = oldx
+    if newy not in range(1,image_data.shape[1]+1):
+        newy = oldy
+    if newz not in range(1,image_data.shape[2]+1):
+        newz = oldz
+    return newx,newy,newz
 
 # Convert 3d slices (nonzero voxels) into melted data frame
 def melt(slices):
@@ -121,6 +138,9 @@ def render_slice(image_id,oldx,oldy,oldz,x,y,z):
     if not os.path.exists(savename):
         urllib.urlretrieve(image['file'],savename)
     image_data = nibabel.load(savename)
+    
+    # Validate coordinates and slice image
+    x,y,z = check_coords(image_data,x,y,z,oldx,oldy,oldz)
     slices = slice_image(image_data,[x,y,z])
 
     # Get coordinates and values for nonzero voxels

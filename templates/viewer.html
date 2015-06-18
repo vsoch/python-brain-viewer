@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<head>
+<title>Whole Brain Scatterplot Regional Comparison</title>
+
+<!-- Latest compiled and minified JavaScript -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<link href="{{ url_for('static',filename='bootstrap-switch.css') }}" rel="stylesheet">
+
+<script src="https://rawgit.com/mbostock/d3/master/lib/colorbrewer/colorbrewer.js"></script>
+<script src="{{ url_for('static',filename='jquery-2.1.3.min.js') }}"></script>
+<script src="{{ url_for('static',filename='bootstrap-switch.js') }}"></script>
+<script src="http://d3js.org/d3.v2.js"></script>
+<script src="{{ url_for('static',filename='render-queue.js') }}"></script>
+<link href ="{{ url_for('static',filename='style.css') }}" rel="stylesheet">
+</head>
+
+<body>
+  <canvas id="canvas" width=1000 height=1000></canvas>
+  <div id="center">
+    <h1>Brain Viewer Prototype</h1>
+    X: <a class="btn btn-default" href="/{{image_id}}/{{ x }}/{{ y }}/{{ z }}/{{ x + 1 }}/{{ y }}/{{ z }}">+</a>
+       <a class="btn btn-default" href="/{{image_id}}/{{ x }}/{{ y }}/{{ z }}/{{ x - 1 }}/{{ y }}/{{ z }}">-</a>
+    Y: <a class="btn btn-default" href="/{{image_id}}/{{ x }}/{{ y }}/{{ z }}/{{ x }}/{{ y + 1 }}/{{ z }}">+</a>
+       <a class="btn btn-default" href="/{{image_id}}/{{ x }}/{{ y }}/{{ z }}/{{ x }}/{{ y - 1 }}/{{ z }}">-</a>
+    Z: <a class="btn btn-default" href="/{{image_id}}/{{ x }}/{{ y }}/{{ z }}/{{ x }}/{{ y }}/{{ z + 1 }}">+</a>
+       <a class="btn btn-default" href="/{{image_id}}/{{ x }}/{{ y }}/{{ z }}/{{ x }}/{{ y }}/{{ z -1 }}">-</a>
+</div>
+
+</body>
+<script>
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+
+// Padding and margins
+var margin = {top: 15, right: 5, bottom: 30, left: 30}
+width = document.body.clientWidth
+height = document.body.clientHeight
+canvas.width = width - margin.left - margin.right;
+canvas.height = height - margin.top - margin.bottom;
+ctx.globalCompositeOperation = "destination-over";
+
+// Draw the X and Y axis
+ctx.lineWidth = 2;
+ctx.strokeStyle = '#333';
+ctx.font = 'italic 8pt sans-serif';
+ctx.textAlign = "center";  
+
+// set up a render queue
+var render = renderQueue(dot)
+  .clear(clear_canvas);
+
+// the data will be appended here
+raw = {{ data|safe }}
+render(raw)
+
+// Define the x and y scale for the points
+var xscale = d3.scale.linear()
+    .range([margin.left, canvas.width])
+    .domain([{{ minx }},{{ maxx }}]); // hard coded for current example
+
+var yscale = d3.scale.linear()
+    .range([canvas.height, margin.bottom])
+    .domain([{{ miny }},{{ maxy }}]); // hard coded for current example
+
+
+function dot(pos) {
+
+var colorize = d3.scale.linear()
+    .domain([{{minval}}, 0, {{maxval}}])
+    .range(["blue", "white", "red"]);
+
+  ctx.fillStyle = colorize(pos.value);
+  ctx.beginPath();
+  ctx.fillRect(pos.x,pos.y,4,4);
+  ctx.stroke();
+  ctx.fill();
+};
+
+
+function clear_canvas() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+};
+
+
+</script>

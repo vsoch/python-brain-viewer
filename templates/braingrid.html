@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<head>
+<title>Whole Brain Scatterplot Regional Comparison</title>
+
+<!-- Latest compiled and minified JavaScript -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<link href="css/bootstrap-switch.css" rel="stylesheet">
+<script src="js/jquery-2.1.3.min.js"></script>
+<script src="js/bootstrap-switch.js"></script>
+<script src="http://d3js.org/d3.v2.js"></script>
+<script src="js/render-queue.js"></script>
+<link href ="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+  <canvas id="canvas" width=600 height=600></canvas>
+  <div id="center">
+    <h1>Brain Grid Prototype</h1>
+    <p>Willl be used to overlay different images</p>
+</div>
+
+</body>
+<script>
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+
+// Padding and margins
+var margin = {top: 15, right: 5, bottom: 30, left: 30}
+width = document.body.clientWidth
+height = document.body.clientHeight
+canvas.width = width - margin.left - margin.right;
+canvas.height = height - margin.top - margin.bottom;
+ctx.globalCompositeOperation = "destination-over";
+
+// Draw the X and Y axis
+ctx.lineWidth = 2;
+ctx.strokeStyle = '#333';
+ctx.font = 'italic 8pt sans-serif';
+ctx.textAlign = "center";  
+
+// set up a render queue
+var render = renderQueue(dot)
+  .clear(clear_canvas);
+
+// First queue includes data with all regions
+read("data/thresh_data.tsv",render);
+
+// Function to initialize queue, add data
+function read(input_file,render) {
+
+  d3.tsv(input_file, function(data) {
+
+    data.forEach(function(d) {
+      d.x = +xscale(d.x);
+      d.y = +yscale(d.y);
+    });
+
+  render(data)
+
+  });
+};
+
+// Define the x and y scale for the points
+var xscale = d3.scale.linear()
+    .range([margin.left, canvas.width])
+    .domain([0,882]); // hard coded for current example
+
+var yscale = d3.scale.linear()
+    .range([canvas.height, margin.bottom])
+    .domain([2,807]); // hard coded for current example
+
+function dot(pos) {
+  ctx.fillStyle = pos.colors;
+  ctx.beginPath();
+  ctx.fillRect(pos.x,pos.y,2,2);
+  ctx.stroke();
+  ctx.fill();
+};
+
+
+function clear_canvas() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+};
+
+</script>

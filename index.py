@@ -106,6 +106,11 @@ def init_image():
     # Get coordinates and values for nonzero voxels
     df = melt(slices)    
 
+    # Get standard image, melt equivalently
+    standard = nibabel.load("static/data/MNI152_T1_2mm.nii.gz")
+    standard_slices = slice_image(standard,[x,y,z])
+    standard_df = melt(standard_slices)
+
     # Min and max for each of x and y
     minx = df.x.min()
     miny = df.y.min()

@@ -1,0 +1,91 @@
+<!--* ========================================================================
+ * Image Viewer Prototype with Python
+ * Poldracklab
+ * ========================================================================
+ * Copyright 2015 Poldracklab
+*/-->
+
+<!DOCTYPE html>
+<head>
+<title> Brain Grid Prototype</title>
+
+<!-- Latest compiled and minified JavaScript -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<link href="{{ url_for('static',filename='bootstrap-switch.css') }}" rel="stylesheet">
+
+<script src="https://rawgit.com/mbostock/d3/master/lib/colorbrewer/colorbrewer.js"></script>
+<script src="{{ url_for('static',filename='jquery-2.1.3.min.js') }}"></script>
+<script src="{{ url_for('static',filename='bootstrap-switch.js') }}"></script>
+<script src="http://d3js.org/d3.v2.js"></script>
+<script src="{{ url_for('static',filename='render-queue.js') }}"></script>
+<link href ="{{ url_for('static',filename='style.css') }}" rel="stylesheet">
+</head>
+
+<body>
+  <canvas id="canvas" width=1000 height=2000></canvas>
+<div id="bottom">
+    <h1>Brain Grid Prototype</h1>
+    <a class="btn btn-default" href="/{{image_id}}/z">axial</a>
+    <a class="btn btn-default" href="/{{image_id}}/x">sagittal</a>
+    <a class="btn btn-default" href="/{{image_id}}/y">coronal</a>
+</div>
+
+<button class="btn imageurl" href="http://www.neurovault.org/images/{{image_id}}" target="_blank">{{ image_id }}</button>
+
+</body>
+<script>
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+
+// Padding and margins
+var margin = {top: 15, right: 5, bottom: 30, left: 30}
+width = document.body.clientWidth
+height = document.body.clientHeight
+canvas.width = width - margin.left - margin.right;
+canvas.height = height - margin.top - margin.bottom;
+ctx.globalCompositeOperation = "destination-over";
+
+// Draw the X and Y axis
+ctx.lineWidth = 2;
+ctx.strokeStyle = '#333';
+ctx.font = 'italic 8pt sans-serif';
+ctx.textAlign = "center";  
+
+// set up a render queue
+var render = renderQueue(dot)
+  .clear(clear_canvas);
+
+// the data will be appended here
+raw = {{ data|safe }}
+render(raw)
+
+// Define the x and y scale for the points
+var xscale = d3.scale.linear()
+    .range([margin.left, canvas.width])
+    .domain([{{ minx }},{{ maxx }}]); // hard coded for current example
+
+var yscale = d3.scale.linear()
+    .range([canvas.height, margin.bottom])
+    .domain([{{ miny }},{{ maxy }}]); // hard coded for current example
+
+
+function dot(pos) {
+
+var colorize = d3.scale.linear()
+    .domain([{{minval}}, 0, {{maxval}}])
+    .range(["blue", "white", "red"]);
+
+  ctx.fillStyle = colorize(pos.value);
+  ctx.beginPath();
+  ctx.fillRect(pos.x,pos.y,2,2);
+  ctx.stroke();
+  ctx.fill();
+};
+
+
+function clear_canvas() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+};
+
+
+</script>

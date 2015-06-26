@@ -7,7 +7,6 @@
 
 from urllib2 import Request, urlopen, HTTPError
 from flask import Flask, render_template
-from nilearn.image import resample_img
 import numpy
 import random
 import pandas

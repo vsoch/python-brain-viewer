@@ -155,5 +155,4 @@ def render_slice(image_id,direction):
     return render_grid(image_data,image_id,direction,savename)
 
 if __name__ == '__main__':
-    app.debug = True
-    app.run()
+    app.run(host="0.0.0.0", debug=True)

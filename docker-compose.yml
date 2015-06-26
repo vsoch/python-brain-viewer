@@ -1,7 +1,7 @@
 web:
   build: .
-  image: vsoch/braingrid
-  command: python grid.py
+  #image: vsoch/braingrid
+  #command: python grid.py
   ports:
    - "5000:5000"
   volumes:

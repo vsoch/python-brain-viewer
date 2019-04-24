@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<title>Render Queue</title>
+<style type="text/css">
+html, body { background: #f7f7f7; height: 100%; margin: 0; padding: 0; color: #b6b6b6; font-family: Ubuntu, Helvetica, sans-serif; font-size: 15px; line-height: 1.35em;}
+a { color: #6be; text-decoration: none; }
+#canvas { position: fixed; }
+#center { position: absolute; top: 0; left: 0; margin: 40px; width: 520px; padding: 20px; background: #444; background: rgba(0,0,0,0.9); border-radius: 8px;}
+h1 { margin-top:0; padding: 3px 0; font-size: 1.4em; }
+h1, h3 { color: #f9f9f9; border-bottom: 1px solid #333; }
+h3 { font-size: 1em; }
+.yellow { color: #ea3; }
+</style>
+<body>
+  <canvas id="canvas" width=600 height=600></canvas>
+  <div id="center">
+    <h1>Render Queue</h1>
+    <p>
+    Progressive rendering for too much data.
+    </p>
+    <p>
+    This page has 600,000 randomly placed points with <a href="http://bl.ocks.org/3289530">HCL color space</a> interpolation. By putting the data in a queue and rendering 1,000 dots per frame, the page slowly builds up the final image. Using <a href="http://paulirish.com/2011/requestanimationframe-for-smart-animating/">requestAnimationFrame</a>, the page remains responsive during rendering.
+    </p>
+    <p>
+    There is a pause on page load as the data is generated. This could be improved by processing the data in a queue, and running both the processing and rendering queues concurrently.
+    </p>
+    <p>
+    Another good improvement would be a logging pattern for performance benchmarks.
+    </p>
+    <p>
+    This pattern based on the <a href="http://bl.ocks.org/1297383">performance</a> <a href="http://bl.ocks.org/1296930">tests</a> of <a href="https://groups.google.com/forum/?fromgroups#!topic/d3-js/ZJ6pznVU5LQ">Steven Bannasch and Ger Hobbelt</a> and polyline rendering from <a href="http://bl.ocks.org/d/3290392/">Nutrient parallel coordinates</a>.
+    </p>
+    <p>
+    <em>Think you can do better?</em>
+    </p>
+    <p>
+    Render Queue is <a href="render-queue.js">only 70 lines long</a> and licensed under the WTFPL.<br/>
+    So do it.
+    </p>
+    <h1>API Reference</h1>
+    <h3></em>renderQueue(function)</h3>
+    <p>
+      Return a renderQueue by passing in a <em>function which renders one data point</em>.
+    </p>
+    <h3>queue(data)</h3>
+    <p>
+      Populate the queue with an array of data and begin rendering.
+    </p>
+    <h3>queue.clear(function)</h3>
+    <p>
+      Provide a function which clears the canvas. This is called when new data is passed in.
+    </p>
+    <h3>queue.add(data)</h3>
+    <p>
+      Add an array of data to the queue and render it.
+    </p>
+    <h3>queue.invalidate()</h3>
+    <p>
+      Invalidate the queue and stop rendering.
+    </p>
+    <h3>queue.rate(<em>num</em>)</h3>
+    <p>
+      Get or set the number of data entries to be rendered each frame.
+    </p>
+    <h3>queue.remaining()</h3>
+    <p>
+      Get the length of the queue. This decreases as rendering occurs.
+    </p>
+    <!--
+    <pre>
+      var draw_dot = function(p) {
+        ctx.fillRect(p.x, p.y, 1,1);
+      };
+
+      var clear_canvas = function() {
+        ctx.clearCanvas(0,0,w,h);
+      };
+
+      var render = renderQueue(draw_dot).clear(clear_canvas);
+
+      var data = d3.range(50000)
+        .map(function(i) {
+          return {
+            x: Math.random(),
+            y: Math.random()
+          }
+        });
+
+      render(data);
+    </pre>
+    -->
+  <h1>License</h1>
+    <small><pre>
+DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE 
+Version 2, December 2004 
+
+Copyright (C) 2012 Kai Chang <kai.s.chang@@gmail.com> 
+
+Everyone is permitted to copy and distribute verbatim or modified 
+copies of this license document, and changing it is allowed as long 
+as the name is changed. 
+
+DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE 
+TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION 
+
+0. You just DO WHAT THE FUCK YOU WANT TO. 
+    </pre></small>
+  </div>
+</body>
+<script src="http://d3js.org/d3.v2.js"></script>
+<script src="render-queue.js"></script>
+<script>
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+
+canvas.width = document.body.clientWidth;
+canvas.height = document.body.clientHeight;
+ctx.globalCompositeOperation = "destination-over";
+
+var color = d3.scale.linear()
+   .domain([0, 0.5, 1])
+      .range(["#ef2212", "#e7c767", "#2799df"])
+      .interpolate(d3.interpolateHcl);
+
+// set up a render queue
+var render = renderQueue(dot)
+  .clear(clear_canvas);
+
+// queue up some generated data
+render(generate(600000));
+
+function generate(n) {
+  return d3.range(n).map(function(i) {
+    return [
+      canvas.width*Math.random(),              // x
+      canvas.height*Math.random(),             // y
+      color(Math.random())
+    ];
+  });
+};
+
+function dot(pos) {
+  ctx.fillStyle = pos[2];
+  ctx.beginPath();
+  ctx.fillRect(pos[0]-1,pos[1]-1,2,2);
+  ctx.stroke();
+  ctx.fill();
+};
+
+function clear_canvas() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+};
+
+</script>
